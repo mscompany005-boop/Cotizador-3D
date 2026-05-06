@@ -7,11 +7,20 @@
 <title>Bitácora · Proyecto Filtro</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.min.js"></script>
-<script crossorigin src="https://unpkg.com/prop-types@15/prop-types.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.4/babel.min.js"></script>
+<script>
+  // Global error catcher so users see something if JS fails
+  window.addEventListener('error', function(e) {
+    var root = document.getElementById('root');
+    if (root && !root.hasChildNodes()) {
+      root.innerHTML = '<div style="font-family:sans-serif;padding:30px;max-width:600px;margin:40px auto;background:#fff3f3;border:1px solid #f88;border-radius:8px;color:#700;"><h2 style="margin:0 0 10px 0;">Error al cargar la app</h2><p style="margin:0 0 8px 0;font-size:14px;">' + (e.message || 'Error desconocido') + '</p><p style="margin:0;font-size:12px;color:#a55;">Archivo: ' + (e.filename || '?') + ' línea: ' + (e.lineno || '?') + '</p><p style="margin:12px 0 0 0;font-size:13px;">Mándale screenshot de este mensaje a Claude para que te ayude.</p></div>';
+    }
+  });
+</script>
 <style>
   body { font-family: 'Cormorant Garamond', Georgia, serif; margin: 0; }
   .font-sans { font-family: 'Inter', system-ui, sans-serif; }
@@ -45,7 +54,21 @@
 
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef } = React;
-const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, PieChart, Pie, Cell } = Recharts;
+// Defensive Recharts loading
+const Recharts = window.Recharts || {};
+const BarChart = Recharts.BarChart || (() => null);
+const Bar = Recharts.Bar || (() => null);
+const XAxis = Recharts.XAxis || (() => null);
+const YAxis = Recharts.YAxis || (() => null);
+const CartesianGrid = Recharts.CartesianGrid || (() => null);
+const Tooltip = Recharts.Tooltip || (() => null);
+const ResponsiveContainer = Recharts.ResponsiveContainer || (({children}) => <div>{children}</div>);
+const Legend = Recharts.Legend || (() => null);
+const LineChart = Recharts.LineChart || (() => null);
+const Line = Recharts.Line || (() => null);
+const PieChart = Recharts.PieChart || (() => null);
+const Pie = Recharts.Pie || (() => null);
+const Cell = Recharts.Cell || (() => null);
 
 // ---------- Inline icon components (replacing lucide-react) ----------
 const makeIcon = (paths) => ({ size = 16, className = '', style = {}, ...rest }) => (
@@ -967,7 +990,11 @@ ${entriesHtml}
   </body></html>`;
 }
 
+try {
 ReactDOM.createRoot(document.getElementById(‘root’)).render(<BitacoraApp />);
+} catch (err) {
+document.getElementById(‘root’).innerHTML = ‘<div style="font-family:sans-serif;padding:30px;max-width:600px;margin:40px auto;background:#fff3f3;border:1px solid #f88;border-radius:8px;color:#700;"><h2>Error al renderizar</h2><pre style="white-space:pre-wrap;font-size:12px;">’ + (err.stack || err.message || err) + ‘</pre></div>’;
+}
 </script>
 
 </body>
